@@ -12,6 +12,7 @@ async function fetchInvoices() {
         invoices = await response.json();
         console.log("Fetched Invoices:", invoices);
 
+        // Safely display invoices and update the dashboard
         if (document.getElementById("invoice-table-body")) {
             displayInvoices(invoices);
         }
@@ -25,16 +26,24 @@ async function fetchInvoices() {
 
 // Update dashboard metrics
 function updateDashboard() {
-    const totalExpenses = invoices.reduce(
-        (sum, i) => sum + (i.totalPrice || 0),
-        0
-    );
-    const totalDevices = invoices.reduce(
-        (count, invoice) => count + (invoice.devices ? invoice.devices.length : 0),
-        0
-    );
-    const openInvoices = invoices.filter((i) => i.devices.some(d => d.status === "Open")).length;
+    let totalExpenses = 0;
+    let totalDevices = 0;
+    let openInvoices = 0;
 
+    invoices.forEach((invoice) => {
+        const devices = invoice.devices || []; // Default to an empty array
+        totalDevices += devices.length;
+
+        // Add total price of each device
+        totalExpenses += devices.reduce((sum, d) => sum + (d.price || 0), 0);
+
+        // Count invoices with open devices
+        if (devices.some((d) => d.status === "Open")) {
+            openInvoices++;
+        }
+    });
+
+    // Update dashboard
     document.getElementById("total-expenses").innerText = `$${totalExpenses}`;
     document.getElementById("open-invoices").innerText = openInvoices;
     document.getElementById("total-devices").innerText = totalDevices;
@@ -74,9 +83,21 @@ function displayInvoices(invoicesToDisplay) {
     tableBody.innerHTML = ""; // Clear existing rows
 
     invoicesToDisplay.forEach((invoice) => {
-        // Ensure 'devices' exists and is an array
-        if (Array.isArray(invoice.devices)) {
-            invoice.devices.forEach((device) => {
+        const devices = invoice.devices || []; // Default to empty array
+
+        if (devices.length === 0) {
+            // Placeholder for invoices without devices
+            const row = `
+                <tr>
+                    <td>${invoice.customerName || "Unknown"}</td>
+                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                    <td colspan="12">No devices available</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        } else {
+            // Display devices if they exist
+            devices.forEach((device) => {
                 const row = `
                     <tr>
                         <td>${invoice.customerName || "Unknown"}</td>
@@ -97,8 +118,6 @@ function displayInvoices(invoicesToDisplay) {
                 `;
                 tableBody.insertAdjacentHTML("beforeend", row);
             });
-        } else {
-            console.warn(`Invoice ${invoice._id} has no devices field.`);
         }
     });
 }
@@ -114,8 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const invoiceData = {
                 customerName: document.getElementById("customer-name").value,
                 date: document.getElementById("invoice-date").value,
-                trackingNumber:
-                    document.getElementById("tracking-number").value || null,
+                trackingNumber: document.getElementById("tracking-number").value || null,
                 totalPrice: parseFloat(document.getElementById("total-price").value),
                 devices: [],
             };
@@ -162,7 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     form.reset();
                     window.location.href = "index.html"; // Redirect to dashboard
                 } else {
-                    console.error("Failed to create invoice");
                     alert("Error creating invoice. Please try again.");
                 }
             } catch (error) {

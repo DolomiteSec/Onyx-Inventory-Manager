@@ -34,38 +34,41 @@ async function fetchInvoices() {
 // Update dashboard metrics
 function updateDashboard() {
     const totalExpensesElem = document.getElementById("total-expenses");
+    const actualProfitElem = document.getElementById("actual-profit");
+    const potentialProfitElem = document.getElementById("potential-profit");
     const openInvoicesElem = document.getElementById("open-invoices");
-    const totalDevicesElem = document.getElementById("total-devices");
 
-    // Check if all required elements exist
-    if (!totalExpensesElem || !openInvoicesElem || !totalDevicesElem) {
+    // Safely check for required elements
+    if (
+        !totalExpensesElem ||
+        !actualProfitElem ||
+        !potentialProfitElem ||
+        !openInvoicesElem
+    ) {
         console.warn("Dashboard elements not found. Skipping dashboard update.");
         return;
     }
 
+    // Initialize metrics
     let totalExpenses = 0;
-    let totalDevices = 0;
+    let actualProfit = 0;
+    let potentialProfit = 0;
     let openInvoices = 0;
 
     invoices.forEach((invoice) => {
-        // Safely check for devices array
-        const devices = invoice.devices || [];
-        totalDevices += devices.length;
-
-        // Add total price of each device
-        totalExpenses += devices.reduce((sum, d) => sum + (d.price || 0), 0);
-
-        // Count invoices with open devices
-        if (devices.some((d) => d.status === "Open")) {
-            openInvoices++;
-        }
+        totalExpenses += invoice.purchasePrice || 0; // Sum up purchase prices
+        actualProfit += (invoice.giftCardValue || 0) - (invoice.purchasePrice || 0); // Calculate actual profit
+        potentialProfit += (invoice.giftCardValue || 0); // Potential profit is gift card value
+        if (invoice.status === "Open") openInvoices++; // Count open invoices
     });
 
-    // Update dashboard metrics
+    // Update the DOM with calculated values
     totalExpensesElem.innerText = `$${totalExpenses}`;
+    actualProfitElem.innerText = `$${actualProfit}`;
+    potentialProfitElem.innerText = `$${potentialProfit}`;
     openInvoicesElem.innerText = openInvoices;
-    totalDevicesElem.innerText = totalDevices;
 }
+
 
 // Add Rows to Device Table
 function addDeviceRow() {

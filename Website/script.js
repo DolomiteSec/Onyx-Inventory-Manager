@@ -6,7 +6,11 @@ let invoices = []; // Global variable for invoices
 async function fetchInvoices() {
     try {
         const response = await fetch(backendURL);
+        if (!response.ok) throw new Error("Failed to fetch invoices");
+
         invoices = await response.json();
+        console.log("Fetched Invoices:", invoices); // Debugging
+
         if (document.getElementById("invoice-table-body")) {
             displayInvoices(invoices);
         }
@@ -29,12 +33,10 @@ function updateDashboard() {
 function calculateMetrics() {
     const totalExpenses = invoices.reduce((sum, i) => sum + (i.purchasePrice || 0), 0);
     const actualProfit = invoices.reduce((sum, i) => sum + ((i.giftCardValue || 0) - (i.purchasePrice || 0)), 0);
-    const potentialProfit = invoices.reduce((sum, i) => sum + ((i.potentialProfit || 0) - (i.purchasePrice || 0)), 0);
     const openInvoices = invoices.filter(i => i.status === "Open").length;
 
     document.getElementById("total-expenses").innerText = `$${totalExpenses}`;
     document.getElementById("actual-profit").innerText = `$${actualProfit}`;
-    document.getElementById("potential-profit").innerText = `$${potentialProfit}`;
     document.getElementById("open-invoices").innerText = openInvoices;
 }
 
@@ -50,7 +52,7 @@ function populateTable() {
                 <td>${new Date(invoice.date).toLocaleDateString()}</td>
                 <td>${invoice.phoneModel}</td>
                 <td>$${invoice.purchasePrice}</td>
-                <td>$${(invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)}</td>
+                <td>$${invoice.giftCardValue || 0}</td>
                 <td>${invoice.status}</td>
             </tr>
         `;
@@ -76,11 +78,9 @@ function renderChart() {
     });
 }
 
-// Invoice search functionality
+// Search functionality for invoices
 function setupSearch() {
     const searchBar = document.getElementById("search-bar");
-    const tableBody = document.getElementById("invoice-table-body");
-
     if (!searchBar) return;
 
     searchBar.addEventListener("input", (e) => {
@@ -96,7 +96,6 @@ function setupSearch() {
             );
         });
 
-        tableBody.innerHTML = "";
         displayInvoices(filteredInvoices);
     });
 }
@@ -125,8 +124,6 @@ function displayInvoices(invoicesToDisplay) {
 // Handle form submission to create invoices
 function setupForm() {
     const form = document.getElementById("add-invoice-form");
-    const responseMessage = document.getElementById("responseMessage");
-
     if (!form) return;
 
     form.addEventListener("submit", async (e) => {
@@ -137,6 +134,8 @@ function setupForm() {
             date: document.getElementById("invoice-date").value,
             phoneModel: document.getElementById("phone-model").value,
             purchasePrice: parseFloat(document.getElementById("purchase-price").value),
+            screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
+            laborCost: parseFloat(document.getElementById("labor-cost").value) || 0,
             giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
             status: "Open"
         };
@@ -151,65 +150,22 @@ function setupForm() {
             if (response.ok) {
                 alert("Invoice added successfully!");
                 form.reset();
-                fetchInvoices(); // Reload invoices
-                window.location.href = "index.html";
+                fetchInvoices(); // Reload invoices after adding
+                window.location.href = "index.html"; // Redirect to dashboard
             } else {
-                const error = await response.json();
-                responseMessage.textContent = "❌ Error: " + error.message;
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
             }
-        } catch (err) {
-            console.error("Error adding invoice:", err);
-            responseMessage.textContent = "❌ Failed to connect to the server.";
+        } catch (error) {
+            console.error("Error adding invoice:", error);
+            alert("Error connecting to the server. Please try again.");
         }
     });
 }
 
-// Initialize on page load
+// Initialize the page
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("add-invoice-form");
-    if (form) {
-        console.log("Form found, event listener attached!"); // Debugging
-
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            console.log("Form submitted!"); // Debugging
-
-            const newInvoice = {
-                invoiceID: document.getElementById("invoice-id").value,
-                date: document.getElementById("invoice-date").value,
-                phoneModel: document.getElementById("phone-model").value,
-                purchasePrice: parseFloat(document.getElementById("purchase-price").value),
-                screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
-                laborCost: parseFloat(document.getElementById("labor-cost").value) || 0,
-                giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
-                status: "Open"
-            };
-
-            console.log("Payload:", newInvoice); // Debugging
-
-            try {
-                const response = await fetch("https://onyx-inventory-manager-backend.onrender.com/api/invoices", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(newInvoice)
-                });
-
-                if (response.ok) {
-                    console.log("Invoice added successfully!");
-                    alert("Invoice added successfully!");
-                    form.reset();
-                    window.location.href = "index.html"; // Redirect to home page
-                } else {
-                    console.error("Failed to add invoice");
-                    alert("Error adding invoice. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error connecting to the server.");
-            }
-        });
-    } else {
-        console.error("Form not found!");
-    }
+    fetchInvoices();
+    setupSearch();
+    setupForm();
 });
-

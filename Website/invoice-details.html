@@ -9,18 +9,21 @@
 <body>
     <header>
         <h1>Edit Invoice</h1>
-        <nav>
-            <a href="index.html">Back to Dashboard</a>
-        </nav>
+        <a href="index.html">Back to Dashboard</a>
     </header>
 
     <main>
-        <h2>Invoice Information</h2>
+        <!-- Invoice Form -->
         <form id="edit-invoice-form">
-            <label>Invoice ID: <input type="text" id="invoice-id" readonly></label>
-            <label>Customer Name: <input type="text" id="customer-name"></label>
-            <label>Date: <input type="date" id="invoice-date"></label>
+            <h2>Invoice Information</h2>
+            <label>Invoice ID:</label>
+            <input type="text" id="invoice-id" readonly />
+            <label>Customer Name:</label>
+            <input type="text" id="customer-name" placeholder="Customer Name" required />
+            <label>Date:</label>
+            <input type="date" id="invoice-date" required />
 
+            <!-- Devices Table -->
             <h3>Devices</h3>
             <table>
                 <thead>
@@ -33,14 +36,21 @@
                     </tr>
                 </thead>
                 <tbody id="device-table-body">
-                    <!-- Device rows will be dynamically added here -->
+                    <!-- Device rows will be dynamically populated here -->
                 </tbody>
             </table>
-            <button type="button" onclick="addDeviceRow()">Add Device</button>
-            <button type="submit">Save Changes</button>
+
+            <!-- Buttons for Adding and Saving -->
+            <button type="button" id="add-device-btn" style="margin-top: 10px;">Add Device</button>
+            <button type="submit" id="save-changes-btn" style="margin-top: 10px;">Save Changes</button>
         </form>
     </main>
 
+    <footer>
+        <p>&copy; 2024 Phone Resale Inventory Manager</p>
+    </footer>
+
+    <!-- JavaScript -->
     <script src="invoice-details.js"></script>
 </body>
 </html>

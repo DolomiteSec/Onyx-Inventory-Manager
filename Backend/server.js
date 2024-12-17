@@ -10,8 +10,12 @@ const invoiceRoutes = require("./routes/invoices");
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: "*", // Allows all domains
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"]
 app.use(express.json());
+
 
 // MongoDB Connection
 mongoose

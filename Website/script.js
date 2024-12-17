@@ -1,13 +1,18 @@
 const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
 
-let invoices = [];
+let invoices = []; // Global variable for invoices
 
-// Fetch invoices from the backend
+// Fetch all invoices from the backend
 async function fetchInvoices() {
     try {
         const response = await fetch(backendURL);
         invoices = await response.json();
-        updateDashboard();
+        if (document.getElementById("invoice-table-body")) {
+            displayInvoices(invoices);
+        }
+        if (document.getElementById("total-expenses")) {
+            updateDashboard();
+        }
     } catch (error) {
         console.error("Error fetching invoices:", error);
     }
@@ -55,7 +60,9 @@ function populateTable() {
 
 // Render the profit chart
 function renderChart() {
-    const ctx = document.getElementById("profitChart").getContext("2d");
+    const ctx = document.getElementById("profitChart")?.getContext("2d");
+    if (!ctx) return;
+
     new Chart(ctx, {
         type: "bar",
         data: {
@@ -69,99 +76,13 @@ function renderChart() {
     });
 }
 
-// Table sorting functionality
-function sortTable(columnIndex) {
-    const table = document.querySelector("table tbody");
-    const rows = Array.from(table.rows);
-
-    rows.sort((a, b) => {
-        const cellA = a.cells[columnIndex].innerText;
-        const cellB = b.cells[columnIndex].innerText;
-
-        return cellA.localeCompare(cellB, undefined, { numeric: true });
-    });
-
-    table.innerHTML = "";
-    rows.forEach(row => table.appendChild(row));
-    
-}
-
-// Initialize dashboard
-fetchInvoices();
-
-const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
-
-// Handle "Create Invoice" Form Submission
-document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("add-invoice-form");
-    if (form) {
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            const newInvoice = {
-                invoiceID: document.getElementById("invoice-id").value,
-                date: document.getElementById("invoice-date").value,
-                phoneModel: document.getElementById("phone-model").value,
-                purchasePrice: parseFloat(document.getElementById("purchase-price").value),
-                screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
-                giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
-                status: "Open"
-            };
-
-            fetch(backendURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newInvoice)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("Invoice added successfully!");
-                form.reset();
-                window.location.href = "index.html"; // Redirect back to Home Page
-            })
-            .catch(error => console.error("Error adding invoice:", error));
-        });
-    }
-});
-
-const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
-
-document.addEventListener("DOMContentLoaded", () => {
+// Invoice search functionality
+function setupSearch() {
     const searchBar = document.getElementById("search-bar");
     const tableBody = document.getElementById("invoice-table-body");
-    let invoices = [];
 
-    // Fetch all invoices from the backend
-    async function fetchInvoices() {
-        try {
-            const response = await fetch(backendURL);
-            invoices = await response.json();
-            displayInvoices(invoices);
-        } catch (error) {
-            console.error("Error fetching invoices:", error);
-        }
-    }
+    if (!searchBar) return;
 
-    // Display invoices in the table
-    function displayInvoices(invoicesToDisplay) {
-        tableBody.innerHTML = ""; // Clear previous rows
-
-        invoicesToDisplay.forEach(invoice => {
-            const row = `
-                <tr>
-                    <td>${invoice.invoiceID}</td>
-                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                    <td>${invoice.phoneModel}</td>
-                    <td>$${invoice.purchasePrice}</td>
-                    <td>$${invoice.giftCardValue || 0}</td>
-                    <td>${invoice.status}</td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-        });
-    }
-
-    // Filter invoices based on search input
     searchBar.addEventListener("input", (e) => {
         const searchQuery = e.target.value.toLowerCase();
         const filteredInvoices = invoices.filter(invoice => {
@@ -175,10 +96,77 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         });
 
+        tableBody.innerHTML = "";
         displayInvoices(filteredInvoices);
     });
+}
 
-    // Fetch invoices on page load
+// Display invoices in the table
+function displayInvoices(invoicesToDisplay) {
+    const tableBody = document.getElementById("invoice-table-body");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = "";
+    invoicesToDisplay.forEach(invoice => {
+        const row = `
+            <tr>
+                <td>${invoice.invoiceID}</td>
+                <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                <td>${invoice.phoneModel}</td>
+                <td>$${invoice.purchasePrice}</td>
+                <td>$${invoice.giftCardValue || 0}</td>
+                <td>${invoice.status}</td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
+// Handle form submission to create invoices
+function setupForm() {
+    const form = document.getElementById("add-invoice-form");
+    const responseMessage = document.getElementById("responseMessage");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const newInvoice = {
+            invoiceID: document.getElementById("invoice-id").value,
+            date: document.getElementById("invoice-date").value,
+            phoneModel: document.getElementById("phone-model").value,
+            purchasePrice: parseFloat(document.getElementById("purchase-price").value),
+            giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
+            status: "Open"
+        };
+
+        try {
+            const response = await fetch(backendURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newInvoice)
+            });
+
+            if (response.ok) {
+                alert("Invoice added successfully!");
+                form.reset();
+                fetchInvoices(); // Reload invoices
+                window.location.href = "index.html";
+            } else {
+                const error = await response.json();
+                responseMessage.textContent = "❌ Error: " + error.message;
+            }
+        } catch (err) {
+            console.error("Error adding invoice:", err);
+            responseMessage.textContent = "❌ Failed to connect to the server.";
+        }
+    });
+}
+
+// Initialize on page load
+document.addEventListener("DOMContentLoaded", () => {
     fetchInvoices();
+    setupSearch();
+    setupForm();
 });
-

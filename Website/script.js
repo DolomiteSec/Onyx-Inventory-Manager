@@ -166,7 +166,50 @@ function setupForm() {
 
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
-    fetchInvoices();
-    setupSearch();
-    setupForm();
+    const form = document.getElementById("add-invoice-form");
+    if (form) {
+        console.log("Form found, event listener attached!"); // Debugging
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            console.log("Form submitted!"); // Debugging
+
+            const newInvoice = {
+                invoiceID: document.getElementById("invoice-id").value,
+                date: document.getElementById("invoice-date").value,
+                phoneModel: document.getElementById("phone-model").value,
+                purchasePrice: parseFloat(document.getElementById("purchase-price").value),
+                screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
+                laborCost: parseFloat(document.getElementById("labor-cost").value) || 0,
+                giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
+                status: "Open"
+            };
+
+            console.log("Payload:", newInvoice); // Debugging
+
+            try {
+                const response = await fetch("https://onyx-inventory-manager-backend.onrender.com/api/invoices", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newInvoice)
+                });
+
+                if (response.ok) {
+                    console.log("Invoice added successfully!");
+                    alert("Invoice added successfully!");
+                    form.reset();
+                    window.location.href = "index.html"; // Redirect to home page
+                } else {
+                    console.error("Failed to add invoice");
+                    alert("Error adding invoice. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error connecting to the server.");
+            }
+        });
+    } else {
+        console.error("Form not found!");
+    }
 });
+

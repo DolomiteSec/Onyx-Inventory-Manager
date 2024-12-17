@@ -187,29 +187,63 @@ form.addEventListener("submit", async (e) => {
 
 // Initialize dashboard
 document.addEventListener("DOMContentLoaded", () => {
-    fetchInvoices();
-    setupSearch();
-});
+    const form = document.getElementById("add-invoice-form"); // Select the form by its ID
+    
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-// Search functionality
-function setupSearch() {
-    const searchBar = document.getElementById("search-bar");
-    if (!searchBar) return;
+            const newInvoice = {
+                customerName: document.getElementById("customer-name").value,
+                date: document.getElementById("invoice-date").value,
+                trackingNumber: document.getElementById("tracking-number").value,
+                totalPrice: parseFloat(document.getElementById("total-price").value),
+                devices: []
+            };
 
-    searchBar.addEventListener("input", (e) => {
-        const searchQuery = e.target.value.toLowerCase();
-        const filteredInvoices = invoices.filter((invoice) => {
-            return (
-                invoice.invoiceID.toLowerCase().includes(searchQuery) ||
-                new Date(invoice.date)
-                    .toLocaleDateString()
-                    .includes(searchQuery) ||
-                invoice.phoneModel.toLowerCase().includes(searchQuery) ||
-                String(invoice.purchasePrice).includes(searchQuery) ||
-                invoice.status.toLowerCase().includes(searchQuery)
-            );
+            // Collect device rows
+            const rows = document.querySelectorAll("#device-table-body tr");
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input, select");
+                const device = {
+                    imei: inputs[0].value,
+                    model: inputs[1].value,
+                    color: inputs[2].value,
+                    storage: inputs[3].value,
+                    serialNumber: inputs[4].value,
+                    activationStatus: inputs[5].value,
+                    icloudStatus: inputs[6].value,
+                    blacklistStatus: inputs[7].value,
+                    purchaseCountry: inputs[8].value,
+                    simLockStatus: inputs[9].value,
+                    price: parseFloat(inputs[10].value),
+                    status: inputs[11].value,
+                    howSold: inputs[12].value || null
+                };
+                newInvoice.devices.push(device);
+            });
+
+            console.log("Submitting Invoice:", newInvoice);
+
+            // Send to backend
+            try {
+                const response = await fetch(backendURL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newInvoice)
+                });
+
+                if (response.ok) {
+                    alert("Invoice added successfully!");
+                    window.location.href = "index.html"; // Redirect to dashboard
+                } else {
+                    alert("Error adding invoice. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
         });
-
-        displayInvoices(filteredInvoices);
-    });
-}
+    } else {
+        console.error("Form with ID 'add-invoice-form' not found.");
+    }
+});

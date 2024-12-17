@@ -7,46 +7,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Create New Invoice</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="view-invoices.html">View Invoices</a></li>
-            </ul>
-        </nav>
-    </header>
+    <h1>Create a New Invoice</h1>
+    <form id="invoice-form">
+        <label for="invoiceID">Invoice ID:</label>
+        <input type="text" id="invoiceID" required><br>
 
-    <main>
-        <section>
-            <h2>Invoice Details</h2>
-            <form id="add-invoice-form">
-                <label for="invoice-id">Invoice ID:</label>
-                <input type="text" id="invoice-id" required><br><br>
+        <label for="date">Date:</label>
+        <input type="date" id="date" required><br>
 
-                <label for="invoice-date">Date:</label>
-                <input type="date" id="invoice-date" required><br><br>
+        <label for="phoneModel">Phone Model:</label>
+        <input type="text" id="phoneModel" required><br>
 
-                <label for="phone-model">Phone Model:</label>
-                <input type="text" id="phone-model" required><br><br>
+        <label for="purchasePrice">Purchase Price:</label>
+        <input type="number" id="purchasePrice" required><br>
 
-                <label for="purchase-price">Purchase Price:</label>
-                <input type="number" id="purchase-price" required><br><br>
+        <label for="giftCardValue">Gift Card Value:</label>
+        <input type="number" id="giftCardValue" required><br>
 
-                <label for="screen-cost">Screen Cost:</label>
-                <input type="number" id="screen-cost"><br><br>
+        <label for="status">Status:</label>
+        <select id="status">
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+        </select><br>
 
-                <label for="gift-card-value">Gift Card Value:</label>
-                <input type="number" id="gift-card-value"><br><br>
+        <button type="submit">Add Invoice</button>
+    </form>
 
-                <button type="submit">Add Invoice</button>
-            </form>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 Phone Resale Inventory Manager</p>
-    </footer>
+    <p id="responseMessage"></p>
 
     <script src="script.js"></script>
 </body>

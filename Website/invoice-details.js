@@ -1,6 +1,6 @@
 const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
-let invoiceId; // To store the ID
-let invoiceData = {}; // To hold the invoice data
+let invoiceId = ""; // Store the ID globally
+let invoiceData = {}; // Hold the invoice data
 
 // Extract Invoice ID from URL
 function getInvoiceId() {
@@ -8,23 +8,21 @@ function getInvoiceId() {
     invoiceId = params.get("id");
     if (!invoiceId) {
         alert("No invoice ID provided.");
-        window.location.href = "index.html"; // Redirect back to the dashboard
+        window.location.href = "index.html"; // Redirect back to dashboard
     }
 }
 
-// Fetch Invoice Details and Populate the Form
-async function fetchInvoice() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const invoiceId = urlParams.get("id");
-
+// Fetch Invoice Data and Populate the Form
+async function fetchInvoiceData() {
     try {
         const response = await fetch(`${backendURL}/${invoiceId}`);
-        if (!response.ok) throw new Error("Failed to fetch invoice");
+        if (!response.ok) throw new Error("Failed to fetch invoice data.");
 
-        const invoice = await response.json();
-        populateInvoiceForm(invoice);
+        invoiceData = await response.json();
+        populateInvoiceForm(invoiceData);
     } catch (error) {
-        console.error("Error fetching invoice:", error);
+        console.error("Error fetching invoice data:", error);
+        alert("Error loading invoice details.");
     }
 }
 
@@ -37,29 +35,28 @@ function populateInvoiceForm(invoice) {
         : "";
 
     const tableBody = document.getElementById("device-table-body");
-    tableBody.innerHTML = "";
+    tableBody.innerHTML = ""; // Clear existing rows
 
-    invoice.devices.forEach((device, index) => {
-        const row = `
-            <tr>
-                <td><input type="text" value="${device.imei || ""}" /></td>
-                <td><input type="text" value="${device.model || ""}" /></td>
-                <td><input type="number" value="${device.price || 0}" /></td>
-                <td>
-                    <select>
-                        <option value="Open" ${
-                            device.status === "Open" ? "selected" : ""
-                        }>Open</option>
-                        <option value="Sold" ${
-                            device.status === "Sold" ? "selected" : ""
-                        }>Sold</option>
-                    </select>
-                </td>
-                <td><button type="button" onclick="removeDeviceRow(this)">Remove</button></td>
-            </tr>
-        `;
-        tableBody.insertAdjacentHTML("beforeend", row);
-    });
+    // Populate Devices Table
+    if (invoice.devices && invoice.devices.length > 0) {
+        invoice.devices.forEach((device) => {
+            const row = `
+                <tr>
+                    <td><input type="text" value="${device.imei || ""}" placeholder="IMEI" /></td>
+                    <td><input type="text" value="${device.model || ""}" placeholder="Model" /></td>
+                    <td><input type="number" value="${device.price || 0}" placeholder="Price" /></td>
+                    <td>
+                        <select>
+                            <option value="Open" ${device.status === "Open" ? "selected" : ""}>Open</option>
+                            <option value="Sold" ${device.status === "Sold" ? "selected" : ""}>Sold</option>
+                        </select>
+                    </td>
+                    <td><button type="button" onclick="removeDeviceRow(this)">Remove</button></td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        });
+    }
 }
 
 // Add a New Device Row
@@ -89,11 +86,8 @@ function removeDeviceRow(button) {
 }
 
 // Save Changes to Backend
-async function saveInvoice(e) {
+async function saveChanges(e) {
     e.preventDefault();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const invoiceId = urlParams.get("id");
 
     const updatedInvoice = {
         customerName: document.getElementById("customer-name").value,
@@ -101,20 +95,19 @@ async function saveInvoice(e) {
         devices: [],
     };
 
-    // Collect Devices Data
+    // Collect Devices from Table
     const rows = document.querySelectorAll("#device-table-body tr");
     rows.forEach((row) => {
         const inputs = row.querySelectorAll("input, select");
         const device = {
             imei: inputs[0].value,
             model: inputs[1].value,
-            price: parseFloat(inputs[2].value),
+            price: parseFloat(inputs[2].value) || 0,
             status: inputs[3].value,
         };
         updatedInvoice.devices.push(device);
     });
 
-    // Send Updated Data to Backend
     try {
         const response = await fetch(`${backendURL}/${invoiceId}`, {
             method: "PUT",
@@ -124,9 +117,9 @@ async function saveInvoice(e) {
 
         if (response.ok) {
             alert("Invoice updated successfully!");
-            window.location.href = "index.html";
+            window.location.href = "index.html"; // Redirect back to dashboard
         } else {
-            throw new Error("Failed to update invoice");
+            throw new Error("Failed to update invoice.");
         }
     } catch (error) {
         console.error("Error saving invoice:", error);
@@ -134,10 +127,16 @@ async function saveInvoice(e) {
     }
 }
 
-// Initialize
+// Initialize Page
 document.addEventListener("DOMContentLoaded", () => {
-    fetchInvoice();
+    getInvoiceId(); // Extract the ID from URL
+    fetchInvoiceData(); // Fetch invoice data
+
+    // Add event listeners
     document
-        .getElementById("edit-invoice-form")
-        .addEventListener("submit", saveInvoice);
+        .getElementById("save-changes-btn")
+        .addEventListener("click", saveChanges);
+    document
+        .getElementById("add-device-btn")
+        .addEventListener("click", addDeviceRow);
 });

@@ -3,19 +3,27 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
-// Import Routes
-const invoiceRoutes = require("./routes/invoices");
+// Force HTTPS Middleware
+const enforceHttps = (req, res, next) => {
+    if (req.headers["x-forwarded-proto"] !== "https") {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+};
 
 // Initialize the App
 const app = express();
+if (process.env.NODE_ENV === "production") {
+    app.use(enforceHttps);
+}
 
 // Middleware
-app.use(cors({
-    origin: "*", // Allows all domains
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"]
-}));
-app.use(express.json()); // Parse incoming JSON requests
+app.use(cors());
+app.use(express.json());
+
+// Routes
+const invoiceRoutes = require("./routes/invoices");
+app.use("/api/invoices", invoiceRoutes);
 
 // MongoDB Connection
 mongoose
@@ -29,11 +37,6 @@ mongoose
         process.exit(1);
     });
 
-// Routes
-app.use("/api/invoices", invoiceRoutes);
-
 // Start the Server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

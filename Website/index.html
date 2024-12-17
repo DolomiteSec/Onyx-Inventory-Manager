@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <!-- Header Section -->
     <header>
         <h1>Phone Resale Inventory Manager</h1>
         <nav>
@@ -18,42 +19,51 @@
         </nav>
     </header>
 
+    <!-- Main Content -->
     <main>
         <!-- Metrics Section -->
         <section id="metrics">
-            <div class="metric-card">
-                <h3>Total Expenses</h3>
-                <p id="total-expenses">$0</p>
-            </div>
-            <div class="metric-card">
-                <h3>Actual Profit</h3>
-                <p id="actual-profit">$0</p>
-            </div>
-            <div class="metric-card">
-                <h3>Potential Profit</h3>
-                <p id="potential-profit">$0</p>
-            </div>
-            <div class="metric-card">
-                <h3>Open Invoices</h3>
-                <p id="open-invoices">0</p>
+            <h2>Dashboard Metrics</h2>
+            <div class="metric-container">
+                <div class="metric-card">
+                    <h3>Total Expenses</h3>
+                    <p id="total-expenses">$0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Actual Profit</h3>
+                    <p id="actual-profit">$0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Potential Profit</h3>
+                    <p id="potential-profit">$0</p>
+                </div>
+                <div class="metric-card">
+                    <h3>Open Invoices</h3>
+                    <p id="open-invoices">0</p>
+                </div>
             </div>
         </section>
 
-        <!-- Invoice Table -->
+        <!-- Recent Invoices Section -->
         <section>
             <h2>Recent Invoices</h2>
+            <input type="text" id="search-bar" placeholder="Search invoices..." />
+
             <table>
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Invoice ID</th>
-                        <th onclick="sortTable(1)">Date</th>
+                        <th onclick="sortTable(0)">Invoice ID &#8597;</th>
+                        <th onclick="sortTable(1)">Date &#8597;</th>
                         <th>Phone Model</th>
-                        <th>Total Cost</th>
+                        <th>Purchase Price</th>
+                        <th>Gift Card Value</th>
                         <th>Profit</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="invoice-table-body"></tbody>
+                <tbody id="invoice-table-body">
+                    <!-- Invoice rows will be dynamically populated -->
+                </tbody>
             </table>
             <button onclick="window.location.href='create-invoice.html'">Create New Invoice</button>
         </section>
@@ -65,10 +75,12 @@
         </section>
     </main>
 
+    <!-- Footer -->
     <footer>
         <p>&copy; 2024 Phone Resale Inventory Manager</p>
     </footer>
 
+    <!-- Scripts -->
     <script src="script.js"></script>
 </body>
 </html>

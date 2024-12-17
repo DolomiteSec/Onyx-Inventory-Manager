@@ -74,27 +74,32 @@ function displayInvoices(invoicesToDisplay) {
     tableBody.innerHTML = ""; // Clear existing rows
 
     invoicesToDisplay.forEach((invoice) => {
-        invoice.devices.forEach((device) => {
-            const row = `
-                <tr>
-                    <td>${invoice.customerName || "Unknown"}</td>
-                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                    <td>${device.imei || "N/A"}</td>
-                    <td>${device.model || "N/A"}</td>
-                    <td>${device.color || "N/A"}</td>
-                    <td>${device.storage || "N/A"}</td>
-                    <td>${device.serialNumber || "N/A"}</td>
-                    <td>${device.activationStatus || "N/A"}</td>
-                    <td>${device.icloudStatus || "N/A"}</td>
-                    <td>${device.blacklistStatus || "N/A"}</td>
-                    <td>${device.purchaseCountry || "N/A"}</td>
-                    <td>${device.simLockStatus || "N/A"}</td>
-                    <td>$${device.price || 0}</td>
-                    <td>${device.status || "Open"}</td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML("beforeend", row);
-        });
+        // Ensure 'devices' exists and is an array
+        if (Array.isArray(invoice.devices)) {
+            invoice.devices.forEach((device) => {
+                const row = `
+                    <tr>
+                        <td>${invoice.customerName || "Unknown"}</td>
+                        <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                        <td>${device.imei || "N/A"}</td>
+                        <td>${device.model || "N/A"}</td>
+                        <td>${device.color || "N/A"}</td>
+                        <td>${device.storage || "N/A"}</td>
+                        <td>${device.serialNumber || "N/A"}</td>
+                        <td>${device.activationStatus || "N/A"}</td>
+                        <td>${device.icloudStatus || "N/A"}</td>
+                        <td>${device.blacklistStatus || "N/A"}</td>
+                        <td>${device.purchaseCountry || "N/A"}</td>
+                        <td>${device.simLockStatus || "N/A"}</td>
+                        <td>$${device.price || 0}</td>
+                        <td>${device.status || "Open"}</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML("beforeend", row);
+            });
+        } else {
+            console.warn(`Invoice ${invoice._id} has no devices field.`);
+        }
     });
 }
 

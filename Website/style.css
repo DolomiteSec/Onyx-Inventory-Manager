@@ -1,70 +1,90 @@
-/* style.css */
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
     background-color: #f4f4f9;
+    color: #333;
 }
 
-nav {
+header {
     background-color: #333;
     color: white;
-    padding: 1em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 1rem;
+    text-align: center;
 }
 
 nav ul {
     list-style: none;
+    padding: 0;
     display: flex;
-    gap: 1em;
+    justify-content: center;
+}
+
+nav li {
+    margin: 0 1rem;
 }
 
 nav a {
     color: white;
     text-decoration: none;
+    font-size: 1.1rem;
 }
 
-.container {
-    padding: 2em;
+h2 {
+    text-align: center;
+    margin: 1rem 0;
 }
 
-/* Metrics Section */
 #metrics {
     display: flex;
     justify-content: space-around;
-    gap: 1em;
+    flex-wrap: wrap;
+    padding: 1rem;
 }
 
 .metric-card {
     background: white;
-    padding: 1em;
-    border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
     text-align: center;
-    flex: 1;
+    width: 200px;
+    margin: 1rem;
 }
 
-/* Invoice Table */
 table {
     width: 100%;
-    margin-top: 1em;
+    margin-top: 1rem;
     border-collapse: collapse;
 }
 
 th, td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 0.5rem;
     text-align: center;
 }
 
 th {
     background-color: #333;
     color: white;
+    cursor: pointer;
 }
 
-/* Charts */
-#charts {
-    margin-top: 2em;
-    text-align: center;
+th:hover {
+    background-color: #555;
+}
+
+button {
+    display: block;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #219150;
 }

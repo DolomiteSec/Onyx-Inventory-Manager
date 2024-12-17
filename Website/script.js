@@ -119,6 +119,69 @@ async function toggleStatus(id, currentStatus) {
         console.error("Error updating status:", error);
     }
 }
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Collect Invoice Data
+    const invoiceData = {
+        customerName: document.getElementById("customer-name").value,
+        date: document.getElementById("invoice-date").value,
+        trackingNumber:
+            document.getElementById("tracking-number").value || null,
+        totalPrice: parseFloat(document.getElementById("total-price").value),
+        devices: [],
+    };
+
+    // Collect Devices from Table
+    const rows = document.querySelectorAll("#device-table-body tr");
+    rows.forEach((row) => {
+        const inputs = row.querySelectorAll("input, select");
+        const device = {
+            imei: inputs[0].value,
+            model: inputs[1].value,
+            color: inputs[2].value,
+            storage: inputs[3].value,
+            serialNumber: inputs[4].value,
+            activationStatus: inputs[5].value,
+            icloudStatus: inputs[6].value,
+            blacklistStatus: inputs[7].value,
+            purchaseCountry: inputs[8].value,
+            simLockStatus: inputs[9].value,
+            price: parseFloat(inputs[10].value),
+            status: inputs[11].value,
+            howSold: inputs[12].value || null,
+        };
+        invoiceData.devices.push(device);
+    });
+
+    // Validate Total Price
+    const priceSum = invoiceData.devices.reduce((sum, d) => sum + d.price, 0);
+    if (priceSum !== invoiceData.totalPrice) {
+        alert("Error: Device prices do not match the total price.");
+        return;
+    }
+
+    // Send Data to Backend
+    try {
+        const response = await fetch(backendURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(invoiceData),
+        });
+
+        if (response.ok) {
+            alert("Invoice created successfully!");
+            form.reset();
+            window.location.href = "index.html"; // Redirect to dashboard
+        } else {
+            console.error("Failed to create invoice");
+            alert("Error creating invoice. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error connecting to server.");
+    }
+});
 
 // Initialize dashboard
 document.addEventListener("DOMContentLoaded", () => {

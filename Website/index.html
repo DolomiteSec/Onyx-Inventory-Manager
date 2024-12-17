@@ -4,73 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phone Resale Dashboard</title>
-    <!-- Link to external styles -->
     <link rel="stylesheet" href="style.css">
-    <!-- Include any chart libraries (e.g., Chart.js) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <h1>Phone Resale Dashboard</h1>
-        <ul>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Invoices</a></li>
-            <li><a href="#">Screens</a></li>
-            <li><a href="#">Summary</a></li>
-        </ul>
-    </nav>
+    <header>
+        <h1>Phone Resale Inventory Manager</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="create-invoice.html">Create Invoice</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <!-- Main Content -->
-    <div class="container">
+    <main>
         <!-- Metrics Section -->
         <section id="metrics">
             <div class="metric-card">
-                <h2>Total Expenses</h2>
+                <h3>Total Expenses</h3>
                 <p id="total-expenses">$0</p>
             </div>
             <div class="metric-card">
-                <h2>Actual Profit</h2>
+                <h3>Actual Profit</h3>
                 <p id="actual-profit">$0</p>
             </div>
             <div class="metric-card">
-                <h2>Potential Profit</h2>
+                <h3>Potential Profit</h3>
                 <p id="potential-profit">$0</p>
             </div>
             <div class="metric-card">
-                <h2>Open Invoices</h2>
+                <h3>Open Invoices</h3>
                 <p id="open-invoices">0</p>
             </div>
         </section>
 
         <!-- Invoice Table -->
-        <section id="invoice-table">
+        <section>
             <h2>Recent Invoices</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Invoice ID</th>
-                        <th>Date</th>
+                        <th onclick="sortTable(0)">Invoice ID</th>
+                        <th onclick="sortTable(1)">Date</th>
                         <th>Phone Model</th>
                         <th>Total Cost</th>
                         <th>Profit</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="invoice-body">
-                    <!-- Data rows will be inserted dynamically -->
-                </tbody>
+                <tbody id="invoice-table-body"></tbody>
             </table>
+            <button onclick="window.location.href='create-invoice.html'">Create New Invoice</button>
         </section>
 
         <!-- Chart Section -->
-        <section id="charts">
+        <section>
             <h2>Profit Overview</h2>
             <canvas id="profitChart"></canvas>
         </section>
-    </div>
+    </main>
 
-    <!-- Link to external JavaScript -->
+    <footer>
+        <p>&copy; 2024 Phone Resale Inventory Manager</p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,20 +1,42 @@
 const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
 
-// Function to fetch and display invoices
-function fetchInvoices() {
-    fetch(backendURL)
-        .then(response => response.json())
-        .then(data => {
-            console.log("Fetched invoices:", data);
-            displayInvoices(data);
-        })
-        .catch(error => console.error("Error fetching invoices:", error));
+let invoices = [];
+
+// Fetch invoices from the backend
+async function fetchInvoices() {
+    try {
+        const response = await fetch(backendURL);
+        invoices = await response.json();
+        updateDashboard();
+    } catch (error) {
+        console.error("Error fetching invoices:", error);
+    }
 }
 
-// Function to display invoices in a table
-function displayInvoices(invoices) {
+// Update the dashboard metrics and table
+function updateDashboard() {
+    calculateMetrics();
+    populateTable();
+    renderChart();
+}
+
+// Calculate and display metrics
+function calculateMetrics() {
+    const totalExpenses = invoices.reduce((sum, i) => sum + (i.purchasePrice || 0), 0);
+    const actualProfit = invoices.reduce((sum, i) => sum + ((i.giftCardValue || 0) - (i.purchasePrice || 0)), 0);
+    const potentialProfit = invoices.reduce((sum, i) => sum + ((i.potentialProfit || 0) - (i.purchasePrice || 0)), 0);
+    const openInvoices = invoices.filter(i => i.status === "Open").length;
+
+    document.getElementById("total-expenses").innerText = `$${totalExpenses}`;
+    document.getElementById("actual-profit").innerText = `$${actualProfit}`;
+    document.getElementById("potential-profit").innerText = `$${potentialProfit}`;
+    document.getElementById("open-invoices").innerText = openInvoices;
+}
+
+// Populate the invoice table
+function populateTable() {
     const tableBody = document.getElementById("invoice-table-body");
-    tableBody.innerHTML = ""; // Clear the table before repopulating
+    tableBody.innerHTML = "";
 
     invoices.forEach(invoice => {
         const row = `
@@ -23,8 +45,7 @@ function displayInvoices(invoices) {
                 <td>${new Date(invoice.date).toLocaleDateString()}</td>
                 <td>${invoice.phoneModel}</td>
                 <td>$${invoice.purchasePrice}</td>
-                <td>$${invoice.screenCost || 0}</td>
-                <td>$${invoice.giftCardValue || 0}</td>
+                <td>$${(invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)}</td>
                 <td>${invoice.status}</td>
             </tr>
         `;
@@ -32,38 +53,37 @@ function displayInvoices(invoices) {
     });
 }
 
-// Function to add a new invoice
-function addInvoice(event) {
-    event.preventDefault(); // Prevent form reload
-
-    const newInvoice = {
-        invoiceID: document.getElementById("invoice-id").value,
-        date: document.getElementById("invoice-date").value,
-        phoneModel: document.getElementById("phone-model").value,
-        purchasePrice: parseFloat(document.getElementById("purchase-price").value),
-        screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
-        giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
-        status: "Open"
-    };
-
-    fetch(backendURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(newInvoice)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Invoice added:", data);
-        alert("Invoice added successfully!");
-        fetchInvoices(); // Refresh the invoice list
-    })
-    .catch(error => console.error("Error adding invoice:", error));
+// Render the profit chart
+function renderChart() {
+    const ctx = document.getElementById("profitChart").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: invoices.map(i => i.invoiceID),
+            datasets: [{
+                label: "Profit per Invoice",
+                data: invoices.map(i => (i.giftCardValue || 0) - (i.purchasePrice || 0)),
+                backgroundColor: "rgba(75, 192, 192, 0.6)"
+            }]
+        }
+    });
 }
 
-// Event Listener for Add Invoice Form
-document.getElementById("add-invoice-form").addEventListener("submit", addInvoice);
+// Table sorting functionality
+function sortTable(columnIndex) {
+    const table = document.querySelector("table tbody");
+    const rows = Array.from(table.rows);
 
-// Fetch invoices when the page loads
+    rows.sort((a, b) => {
+        const cellA = a.cells[columnIndex].innerText;
+        const cellB = b.cells[columnIndex].innerText;
+
+        return cellA.localeCompare(cellB, undefined, { numeric: true });
+    });
+
+    table.innerHTML = "";
+    rows.forEach(row => table.appendChild(row));
+}
+
+// Initialize dashboard
 fetchInvoices();

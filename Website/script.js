@@ -69,34 +69,36 @@ function addDeviceRow() {
 }
 
 // Display invoices in the table
+// Display invoices in the table
 function displayInvoices(invoicesToDisplay) {
     const tableBody = document.getElementById("invoice-table-body");
     tableBody.innerHTML = ""; // Clear existing rows
 
     invoicesToDisplay.forEach((invoice) => {
-        const row = `
-            <tr>
-                <td>${invoice.invoiceID}</td>
-                <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                <td>${invoice.phoneModel}</td>
-                <td>$${invoice.purchasePrice}</td>
-                <td>$${invoice.giftCardValue || 0}</td>
-                <td>$${
-                    (invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)
-                }</td>
-                <td>${invoice.status}</td>
-                <td>
-                    <button onclick="toggleStatus('${invoice._id}', '${
-            invoice.status
-        }')">
-                        Mark as ${invoice.status === "Open" ? "Closed" : "Open"}
-                    </button>
-                </td>
-            </tr>
-        `;
-        tableBody.innerHTML += row;
+        invoice.devices.forEach((device) => {
+            const row = `
+                <tr>
+                    <td>${invoice.customerName || "Unknown"}</td>
+                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                    <td>${device.imei || "N/A"}</td>
+                    <td>${device.model || "N/A"}</td>
+                    <td>${device.color || "N/A"}</td>
+                    <td>${device.storage || "N/A"}</td>
+                    <td>${device.serialNumber || "N/A"}</td>
+                    <td>${device.activationStatus || "N/A"}</td>
+                    <td>${device.icloudStatus || "N/A"}</td>
+                    <td>${device.blacklistStatus || "N/A"}</td>
+                    <td>${device.purchaseCountry || "N/A"}</td>
+                    <td>${device.simLockStatus || "N/A"}</td>
+                    <td>$${device.price || 0}</td>
+                    <td>${device.status || "Open"}</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        });
     });
 }
+
 
 // Toggle invoice status (Open/Closed)
 async function toggleStatus(id, currentStatus) {

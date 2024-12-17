@@ -126,11 +126,20 @@ function displayInvoices(invoicesToDisplay) {
                     <button onclick="toggleInvoiceStatus('${invoice._id}', '${invoice.status}')">
                         Mark as ${invoice.status === "Open" ? "Closed" : "Open"}
                     </button>
+                    <button onclick="navigateToInvoice('${invoice._id}')">
+                        View/Edit
+                    </button>
                 </td>
             </tr>
         `;
         tableBody.insertAdjacentHTML("beforeend", row);
     });
+}
+
+// Function to handle navigation to the invoice-details page
+function navigateToInvoice(invoiceId) {
+    // Redirect to the invoice-details page with the invoice ID as a query parameter
+    window.location.href = `invoice-details.html?id=${invoiceId}`;
 }
 
 

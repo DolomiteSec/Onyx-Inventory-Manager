@@ -3,74 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Resale Dashboard</title>
-    <!-- Link to external styles -->
+    <title>Phone Resale Inventory Manager</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Include any chart libraries (e.g., Chart.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <h1>Phone Resale Dashboard</h1>
-        <ul>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Invoices</a></li>
-            <li><a href="#">Screens</a></li>
-            <li><a href="#">Summary</a></li>
-        </ul>
-    </nav>
+    <!-- Header Section -->
+    <header>
+        <h1>Phone Resale Inventory Manager</h1>
+    </header>
 
     <!-- Main Content -->
-    <div class="container">
-        <!-- Metrics Section -->
-        <section id="metrics">
-            <div class="metric-card">
-                <h2>Total Expenses</h2>
-                <p id="total-expenses">$0</p>
-            </div>
-            <div class="metric-card">
-                <h2>Actual Profit</h2>
-                <p id="actual-profit">$0</p>
-            </div>
-            <div class="metric-card">
-                <h2>Potential Profit</h2>
-                <p id="potential-profit">$0</p>
-            </div>
-            <div class="metric-card">
-                <h2>Open Invoices</h2>
-                <p id="open-invoices">0</p>
-            </div>
-        </section>
-
+    <main>
         <!-- Invoice Table -->
-        <section id="invoice-table">
-            <h2>Recent Invoices</h2>
-            <table>
+        <section>
+            <h2>Invoice List</h2>
+            <table border="1">
                 <thead>
                     <tr>
                         <th>Invoice ID</th>
                         <th>Date</th>
                         <th>Phone Model</th>
-                        <th>Total Cost</th>
-                        <th>Profit</th>
+                        <th>Purchase Price</th>
+                        <th>Screen Cost</th>
+                        <th>Gift Card Value</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="invoice-body">
-                    <!-- Data rows will be inserted dynamically -->
+                <tbody id="invoice-table-body">
+                    <!-- Invoices will be dynamically populated here -->
                 </tbody>
             </table>
         </section>
 
-        <!-- Chart Section -->
-        <section id="charts">
-            <h2>Profit Overview</h2>
-            <canvas id="profitChart"></canvas>
-        </section>
-    </div>
+        <!-- Add New Invoice Form -->
+        <section>
+            <h2>Add New Invoice</h2>
+            <form id="add-invoice-form">
+                <label for="invoice-id">Invoice ID:</label>
+                <input type="text" id="invoice-id" required><br><br>
 
-    <!-- Link to external JavaScript -->
+                <label for="invoice-date">Date:</label>
+                <input type="date" id="invoice-date" required><br><br>
+
+                <label for="phone-model">Phone Model:</label>
+                <input type="text" id="phone-model" required><br><br>
+
+                <label for="purchase-price">Purchase Price:</label>
+                <input type="number" id="purchase-price" required><br><br>
+
+                <label for="screen-cost">Screen Cost:</label>
+                <input type="number" id="screen-cost"><br><br>
+
+                <label for="gift-card-value">Gift Card Value:</label>
+                <input type="number" id="gift-card-value"><br><br>
+
+                <button type="submit">Add Invoice</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Phone Resale Inventory Manager</p>
+    </footer>
+
+    <!-- Link to Script -->
     <script src="script.js"></script>
 </body>
 </html>

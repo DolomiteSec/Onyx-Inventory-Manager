@@ -1,4 +1,5 @@
-const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
+const backendURL =
+    "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
 
 let invoices = []; // Global variable for invoices
 
@@ -24,13 +25,47 @@ async function fetchInvoices() {
 
 // Update dashboard metrics
 function updateDashboard() {
-    const totalExpenses = invoices.reduce((sum, i) => sum + (i.purchasePrice || 0), 0);
-    const actualProfit = invoices.reduce((sum, i) => sum + ((i.giftCardValue || 0) - (i.purchasePrice || 0)), 0);
-    const openInvoices = invoices.filter(i => i.status === "Open").length;
+    const totalExpenses = invoices.reduce(
+        (sum, i) => sum + (i.purchasePrice || 0),
+        0
+    );
+    const actualProfit = invoices.reduce(
+        (sum, i) => sum + ((i.giftCardValue || 0) - (i.purchasePrice || 0)),
+        0
+    );
+    const openInvoices = invoices.filter((i) => i.status === "Open").length;
 
     document.getElementById("total-expenses").innerText = `$${totalExpenses}`;
     document.getElementById("actual-profit").innerText = `$${actualProfit}`;
     document.getElementById("open-invoices").innerText = openInvoices;
+}
+
+// Function to Add Rows to Device Table
+function addDeviceRow() {
+    const tableBody = document.getElementById("device-table-body");
+    const newRow = `
+        <tr>
+            <td><input type="text" placeholder="IMEI" required></td>
+            <td><input type="text" placeholder="Model" required></td>
+            <td><input type="text" placeholder="Color"></td>
+            <td><input type="text" placeholder="Storage"></td>
+            <td><input type="text" placeholder="Serial Number"></td>
+            <td><input type="text" placeholder="Yes/No"></td>
+            <td><input type="text" placeholder="iCloud Status"></td>
+            <td><input type="text" placeholder="Blacklist Status"></td>
+            <td><input type="text" placeholder="Country"></td>
+            <td><input type="text" placeholder="SIM-Lock"></td>
+            <td><input type="number" placeholder="Price" required></td>
+            <td>
+                <select>
+                    <option value="Open">Open</option>
+                    <option value="Sold">Sold</option>
+                </select>
+            </td>
+            <td><input type="text" placeholder="How Sold (if applicable)"></td>
+        </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", newRow);
 }
 
 // Display invoices in the table
@@ -38,7 +73,7 @@ function displayInvoices(invoicesToDisplay) {
     const tableBody = document.getElementById("invoice-table-body");
     tableBody.innerHTML = ""; // Clear existing rows
 
-    invoicesToDisplay.forEach(invoice => {
+    invoicesToDisplay.forEach((invoice) => {
         const row = `
             <tr>
                 <td>${invoice.invoiceID}</td>
@@ -46,10 +81,14 @@ function displayInvoices(invoicesToDisplay) {
                 <td>${invoice.phoneModel}</td>
                 <td>$${invoice.purchasePrice}</td>
                 <td>$${invoice.giftCardValue || 0}</td>
-                <td>$${(invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)}</td>
+                <td>$${
+                    (invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)
+                }</td>
                 <td>${invoice.status}</td>
                 <td>
-                    <button onclick="toggleStatus('${invoice._id}', '${invoice.status}')">
+                    <button onclick="toggleStatus('${invoice._id}', '${
+            invoice.status
+        }')">
                         Mark as ${invoice.status === "Open" ? "Closed" : "Open"}
                     </button>
                 </td>
@@ -67,7 +106,7 @@ async function toggleStatus(id, currentStatus) {
         const response = await fetch(`${backendURL}/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({ status: newStatus }),
         });
 
         if (response.ok) {
@@ -94,10 +133,12 @@ function setupSearch() {
 
     searchBar.addEventListener("input", (e) => {
         const searchQuery = e.target.value.toLowerCase();
-        const filteredInvoices = invoices.filter(invoice => {
+        const filteredInvoices = invoices.filter((invoice) => {
             return (
                 invoice.invoiceID.toLowerCase().includes(searchQuery) ||
-                new Date(invoice.date).toLocaleDateString().includes(searchQuery) ||
+                new Date(invoice.date)
+                    .toLocaleDateString()
+                    .includes(searchQuery) ||
                 invoice.phoneModel.toLowerCase().includes(searchQuery) ||
                 String(invoice.purchasePrice).includes(searchQuery) ||
                 invoice.status.toLowerCase().includes(searchQuery)

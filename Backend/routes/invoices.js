@@ -13,6 +13,20 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Update Invoice Status
+router.put("/:id", async (req, res) => {
+    try {
+        const invoice = await Invoice.findByIdAndUpdate(
+            req.params.id,
+            { status: req.body.status },
+            { new: true }
+        );
+        res.json(invoice);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // Get all invoices
 router.get("/", async (req, res) => {
   try {

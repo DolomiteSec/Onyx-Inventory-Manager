@@ -83,7 +83,44 @@ function sortTable(columnIndex) {
 
     table.innerHTML = "";
     rows.forEach(row => table.appendChild(row));
+    
 }
 
 // Initialize dashboard
 fetchInvoices();
+
+const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
+
+// Handle "Create Invoice" Form Submission
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("add-invoice-form");
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const newInvoice = {
+                invoiceID: document.getElementById("invoice-id").value,
+                date: document.getElementById("invoice-date").value,
+                phoneModel: document.getElementById("phone-model").value,
+                purchasePrice: parseFloat(document.getElementById("purchase-price").value),
+                screenCost: parseFloat(document.getElementById("screen-cost").value) || 0,
+                giftCardValue: parseFloat(document.getElementById("gift-card-value").value) || 0,
+                status: "Open"
+            };
+
+            fetch(backendURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newInvoice)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Invoice added successfully!");
+                form.reset();
+                window.location.href = "index.html"; // Redirect back to Home Page
+            })
+            .catch(error => console.error("Error adding invoice:", error));
+        });
+    }
+});
+

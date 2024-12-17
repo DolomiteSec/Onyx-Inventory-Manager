@@ -1,4 +1,16 @@
 const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
+let invoiceId; // To store the ID
+let invoiceData = {}; // To hold the invoice data
+
+// Extract Invoice ID from URL
+function getInvoiceId() {
+    const params = new URLSearchParams(window.location.search);
+    invoiceId = params.get("id");
+    if (!invoiceId) {
+        alert("No invoice ID provided.");
+        window.location.href = "index.html"; // Redirect back to the dashboard
+    }
+}
 
 // Fetch Invoice Details and Populate the Form
 async function fetchInvoice() {

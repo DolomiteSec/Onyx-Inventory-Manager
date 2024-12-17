@@ -26,12 +26,23 @@ async function fetchInvoices() {
 
 // Update dashboard metrics
 function updateDashboard() {
+    const totalExpensesElem = document.getElementById("total-expenses");
+    const openInvoicesElem = document.getElementById("open-invoices");
+    const totalDevicesElem = document.getElementById("total-devices");
+
+    // Check if all required elements exist
+    if (!totalExpensesElem || !openInvoicesElem || !totalDevicesElem) {
+        console.warn("Dashboard elements not found. Skipping dashboard update.");
+        return;
+    }
+
     let totalExpenses = 0;
     let totalDevices = 0;
     let openInvoices = 0;
 
     invoices.forEach((invoice) => {
-        const devices = invoice.devices || []; // Default to an empty array
+        // Safely check for devices array
+        const devices = invoice.devices || [];
         totalDevices += devices.length;
 
         // Add total price of each device
@@ -43,10 +54,10 @@ function updateDashboard() {
         }
     });
 
-    // Update dashboard
-    document.getElementById("total-expenses").innerText = `$${totalExpenses}`;
-    document.getElementById("open-invoices").innerText = openInvoices;
-    document.getElementById("total-devices").innerText = totalDevices;
+    // Update dashboard metrics
+    totalExpensesElem.innerText = `$${totalExpenses}`;
+    openInvoicesElem.innerText = openInvoices;
+    totalDevicesElem.innerText = totalDevices;
 }
 
 // Add Rows to Device Table

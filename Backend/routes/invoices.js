@@ -6,7 +6,7 @@ const Invoice = require("../models/Invoice");
 router.get("/", async (req, res) => {
     try {
         const invoices = await Invoice.find();
-        console.log("Fetched Invoices:", invoices); // Debugging: log fetched invoices
+        console.log("Fetched Invoices:", invoices);
         res.json(invoices);
     } catch (err) {
         console.error("Error fetching invoices:", err.message);
@@ -14,34 +14,13 @@ router.get("/", async (req, res) => {
     }
 });
 
-// PUT /api/invoices/:id - Update an invoice
-router.put("/:id", async (req, res) => {
-    try {
-        const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(updatedInvoice);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-
-// GET /api/invoices/:id - Fetch a single invoice
-router.get("/:id", async (req, res) => {
-    try {
-        const invoice = await Invoice.findById(req.params.id);
-        if (!invoice) return res.status(404).json({ message: "Invoice not found" });
-        res.json(invoice);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-
 // GET a single invoice by ID
 router.get("/:id", async (req, res) => {
     try {
         const invoice = await Invoice.findById(req.params.id);
-        if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+        if (!invoice) {
+            return res.status(404).json({ message: "Invoice not found" });
+        }
         res.json(invoice);
     } catch (err) {
         console.error("Error fetching invoice:", err.message);
@@ -64,11 +43,11 @@ router.post("/", async (req, res) => {
             date,
             trackingNumber,
             totalPrice,
-            devices, // Ensure devices is passed as an array
+            devices,
         });
 
         const savedInvoice = await invoice.save();
-        console.log("Invoice Created:", savedInvoice); // Debugging
+        console.log("Invoice Created:", savedInvoice);
         res.status(201).json(savedInvoice);
     } catch (err) {
         console.error("Error creating invoice:", err.message);
@@ -76,20 +55,20 @@ router.post("/", async (req, res) => {
     }
 });
 
-// PUT: Update an existing invoice (e.g., marking a phone as sold or updating status)
+// PUT: Update an existing invoice (including adding/removing devices)
 router.put("/:id", async (req, res) => {
     try {
         const updatedInvoice = await Invoice.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body }, // Update any fields provided in the request body
-            { new: true } // Return the updated document
+            { $set: req.body }, // Update only provided fields
+            { new: true, runValidators: true } // Return updated document and validate input
         );
 
         if (!updatedInvoice) {
             return res.status(404).json({ message: "Invoice not found" });
         }
 
-        console.log("Invoice Updated:", updatedInvoice); // Debugging
+        console.log("Invoice Updated:", updatedInvoice);
         res.json(updatedInvoice);
     } catch (err) {
         console.error("Error updating invoice:", err.message);
@@ -105,7 +84,7 @@ router.delete("/:id", async (req, res) => {
             return res.status(404).json({ message: "Invoice not found" });
         }
 
-        console.log("Invoice Deleted:", deletedInvoice); // Debugging
+        console.log("Invoice Deleted:", deletedInvoice);
         res.json({ message: "Invoice deleted successfully" });
     } catch (err) {
         console.error("Error deleting invoice:", err.message);

@@ -14,8 +14,8 @@ app.use(cors({
     origin: "*", // Allows all domains
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"]
-app.use(express.json());
-
+}));
+app.use(express.json()); // Parse incoming JSON requests
 
 // MongoDB Connection
 mongoose
@@ -34,6 +34,6 @@ app.use("/api/invoices", invoiceRoutes);
 
 // Start the Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-    console.log(`🚀 Server running on port ${PORT}`)
-);
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});

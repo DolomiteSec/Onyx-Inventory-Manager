@@ -13,10 +13,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Database Connection
-const dbURI =
-    process.env.MONGODB_URI ||
-    "mongodb+srv://administrator:FandM1221%217@phoneresalecluster.hnx3w.mongodb.net/PhoneResaleCluster?retryWrites=true&w=majority";
+// MongoDB Connection
+const dbURI = process.env.MONGODB_URI;
 
 mongoose
     .connect(dbURI, {
@@ -35,5 +33,5 @@ app.use("/api/invoices", invoiceRoutes);
 // Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
-    console.log(`🚀 Server running on http://localhost:${PORT}`)
+    console.log(`🚀 Server running on port ${PORT}`)
 );

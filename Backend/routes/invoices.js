@@ -14,6 +14,18 @@ router.get("/", async (req, res) => {
     }
 });
 
+// GET /api/invoices/:id - Fetch a single invoice
+router.get("/:id", async (req, res) => {
+    try {
+        const invoice = await Invoice.findById(req.params.id);
+        if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+        res.json(invoice);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
 // GET a single invoice by ID
 router.get("/:id", async (req, res) => {
     try {

@@ -124,3 +124,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+const backendURL = "https://onyx-inventory-manager-backend.onrender.com/api/invoices";
+
+document.addEventListener("DOMContentLoaded", () => {
+    const searchBar = document.getElementById("search-bar");
+    const tableBody = document.getElementById("invoice-table-body");
+    let invoices = [];
+
+    // Fetch all invoices from the backend
+    async function fetchInvoices() {
+        try {
+            const response = await fetch(backendURL);
+            invoices = await response.json();
+            displayInvoices(invoices);
+        } catch (error) {
+            console.error("Error fetching invoices:", error);
+        }
+    }
+
+    // Display invoices in the table
+    function displayInvoices(invoicesToDisplay) {
+        tableBody.innerHTML = ""; // Clear previous rows
+
+        invoicesToDisplay.forEach(invoice => {
+            const row = `
+                <tr>
+                    <td>${invoice.invoiceID}</td>
+                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                    <td>${invoice.phoneModel}</td>
+                    <td>$${invoice.purchasePrice}</td>
+                    <td>$${invoice.giftCardValue || 0}</td>
+                    <td>${invoice.status}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    // Filter invoices based on search input
+    searchBar.addEventListener("input", (e) => {
+        const searchQuery = e.target.value.toLowerCase();
+        const filteredInvoices = invoices.filter(invoice => {
+            return (
+                invoice.invoiceID.toLowerCase().includes(searchQuery) ||
+                new Date(invoice.date).toLocaleDateString().includes(searchQuery) ||
+                invoice.phoneModel.toLowerCase().includes(searchQuery) ||
+                String(invoice.purchasePrice).includes(searchQuery) ||
+                String(invoice.giftCardValue).includes(searchQuery) ||
+                invoice.status.toLowerCase().includes(searchQuery)
+            );
+        });
+
+        displayInvoices(filteredInvoices);
+    });
+
+    // Fetch invoices on page load
+    fetchInvoices();
+});
+

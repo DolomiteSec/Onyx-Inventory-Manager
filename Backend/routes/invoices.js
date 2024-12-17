@@ -14,6 +14,17 @@ router.get("/", async (req, res) => {
     }
 });
 
+// PUT /api/invoices/:id - Update an invoice
+router.put("/:id", async (req, res) => {
+    try {
+        const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedInvoice);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+
 // GET /api/invoices/:id - Fetch a single invoice
 router.get("/:id", async (req, res) => {
     try {

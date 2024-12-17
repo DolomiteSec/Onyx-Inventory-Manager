@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Invoices</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>View All Invoices</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="create-invoice.html">Create Invoice</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Search Invoices</h2>
+            <input type="text" id="search-bar" placeholder="Search invoices...">
+        </section>
+
+        <section>
+            <h2>Invoices</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Date</th>
+                        <th>Phone Model</th>
+                        <th>Total Cost</th>
+                        <th>Gift Card Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-table-body">
+                    <!-- Invoices will be dynamically populated here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Phone Resale Inventory Manager</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

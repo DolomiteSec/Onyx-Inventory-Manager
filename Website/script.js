@@ -12,17 +12,24 @@ async function fetchInvoices() {
         invoices = await response.json();
         console.log("Fetched Invoices:", invoices);
 
-        // Safely display invoices and update the dashboard
+        // Display invoices only if the table exists
         if (document.getElementById("invoice-table-body")) {
             displayInvoices(invoices);
         }
-        if (document.getElementById("total-expenses")) {
+
+        // Update dashboard only if dashboard elements exist
+        if (
+            document.getElementById("total-expenses") &&
+            document.getElementById("open-invoices") &&
+            document.getElementById("total-devices")
+        ) {
             updateDashboard();
         }
     } catch (error) {
         console.error("Error fetching invoices:", error);
     }
 }
+
 
 // Update dashboard metrics
 function updateDashboard() {

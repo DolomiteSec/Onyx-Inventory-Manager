@@ -98,47 +98,38 @@ function addDeviceRow() {
 // Display invoices in the table
 function displayInvoices(invoicesToDisplay) {
     const tableBody = document.getElementById("invoice-table-body");
+
+    // Check if the table body exists
+    if (!tableBody) {
+        console.error("Table body with ID 'invoice-table-body' not found.");
+        return;
+    }
+
+    console.log("Invoices to Display:", invoicesToDisplay); // Debugging
     tableBody.innerHTML = ""; // Clear existing rows
 
+    // Loop through invoices
     invoicesToDisplay.forEach((invoice) => {
-        const devices = invoice.devices || []; // Default to empty array
-
-        if (devices.length === 0) {
-            // Placeholder for invoices without devices
-            const row = `
-                <tr>
-                    <td>${invoice.customerName || "Unknown"}</td>
-                    <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                    <td colspan="12">No devices available</td>
-                </tr>
-            `;
-            tableBody.insertAdjacentHTML("beforeend", row);
-        } else {
-            // Display devices if they exist
-            devices.forEach((device) => {
-                const row = `
-                    <tr>
-                        <td>${invoice.customerName || "Unknown"}</td>
-                        <td>${new Date(invoice.date).toLocaleDateString()}</td>
-                        <td>${device.imei || "N/A"}</td>
-                        <td>${device.model || "N/A"}</td>
-                        <td>${device.color || "N/A"}</td>
-                        <td>${device.storage || "N/A"}</td>
-                        <td>${device.serialNumber || "N/A"}</td>
-                        <td>${device.activationStatus || "N/A"}</td>
-                        <td>${device.icloudStatus || "N/A"}</td>
-                        <td>${device.blacklistStatus || "N/A"}</td>
-                        <td>${device.purchaseCountry || "N/A"}</td>
-                        <td>${device.simLockStatus || "N/A"}</td>
-                        <td>$${device.price || 0}</td>
-                        <td>${device.status || "Open"}</td>
-                    </tr>
-                `;
-                tableBody.insertAdjacentHTML("beforeend", row);
-            });
-        }
+        const row = `
+            <tr>
+                <td>${invoice.invoiceID || "N/A"}</td>
+                <td>${new Date(invoice.date).toLocaleDateString()}</td>
+                <td>${invoice.phoneModel || "N/A"}</td>
+                <td>$${invoice.purchasePrice || 0}</td>
+                <td>$${invoice.giftCardValue || 0}</td>
+                <td>$${(invoice.giftCardValue || 0) - (invoice.purchasePrice || 0)}</td>
+                <td>${invoice.status || "Open"}</td>
+                <td>
+                    <button onclick="toggleInvoiceStatus('${invoice._id}', '${invoice.status}')">
+                        Mark as ${invoice.status === "Open" ? "Closed" : "Open"}
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.insertAdjacentHTML("beforeend", row);
     });
 }
+
 
 // Submit the Invoice Form
 document.addEventListener("DOMContentLoaded", () => {

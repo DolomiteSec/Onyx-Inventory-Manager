@@ -18,7 +18,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: "*", // Allows requests from any domain
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 
 // Routes
